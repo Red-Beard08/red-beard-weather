@@ -78,6 +78,8 @@
 .rbw-empty { color: var(--rbw-secondary); padding-block: 22px; }
 .rbw-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .rbw-compact .rbw-body { padding: 0; }
+.rbw.rbw-compact { flex: 1 1 100%; width: 100%; min-width: 0; align-items: stretch; }
+.rbw-compact > .rbw-body { width: 100%; max-width: none; min-width: 0; box-sizing: border-box; }
 .rbw-compact .rbw-header { padding-bottom: 12px; }
 .rbw-compact .rbw-now { display: block; padding-block: 0 12px; }
 .rbw-compact .rbw-current-reading { gap: 10px; }
