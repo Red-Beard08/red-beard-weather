@@ -1,6 +1,6 @@
 # Red-Beard Weather
 
-Free NWS weather in Obsidian Desktop and iOS: nearby observations, hourly weather for the next 24 hours, a seven-day forecast, official alerts, and portable Markdown snapshots. Defaults to Peoria, Illinois. No server, Docker container, account, API key, or subscription is needed.
+Free NWS weather at a glance in Obsidian Desktop and iOS: condition symbols, current temperature, the next few hours, a 24-hour temperature/precipitation graphic, seven daily ranges, official alerts, and portable Markdown snapshots. Defaults to Peoria, Illinois. No server, Docker container, account, API key, or subscription is needed.
 
 ## Install
 
@@ -10,10 +10,13 @@ With Red-Beard Dashboard **1.3.6 or newer**, Weather registers a module button, 
 
 ## Use
 
-- Open Weather for station conditions, next 24 hours, seven-day forecast, and active alerts. Expand an alert to read the NWS wording and instructions. Each section shows freshness and last-check time.
+- The dashboard widget leads with current temperature and condition, today's available high/low, wind, hourly precipitation chance, and three upcoming hours. Station metadata, diagnostics, legal paragraphs, and operating explanations are omitted. Observation time and relevant stale/unknown-alert warnings remain visible. **Forecast** opens the full view.
+- Open Weather for a temperature curve, precipitation probability bars, hourly condition symbols, and seven compact daily ranges. The view contains graphics and summaries rather than an hourly table. Expand a day or alert to read the official wording. **Weather details & sources** holds station provenance, provider links, and per-feed freshness/error detail.
 - **Refresh** checks for eligible updates, respecting provider cache lifetimes and rate-limit retry instructions; it does not bypass them.
 - **New Weather Snapshot** checks weather, then creates a new note under `Weather/Snapshots`. Notes contain location, timestamps, units, provider links, conditions, forecasts, alerts, and a **My notes** section. Existing notes are never rewritten. Filenames use a UTC timestamp and random suffix; displayed times use the configured time zone.
 - Settings configure display name, latitude/longitude, U.S./metric units, IANA time zone, snapshot folder, and automatic refresh. Changing storage folders never moves files. Changing coordinates or units starts a separate cache to avoid mixing locations.
+
+Graphics use existing NWS data: a missing temperature breaks the curve, a missing precipitation probability stays unknown, and a missing daily high/low stays a dash. The precipitation graphic has a 0–100% probability scale, separate from temperature. Daily ranges combine the available daytime high and nighttime low for the location's calendar day. No probabilities or missing values are invented. Numeric text alternatives accompany the chart. Refresh preserves focused controls, expanded forecasts/alerts, and scroll position; weather refresh does not rebuild the surrounding dashboard.
 
 ## Data, freshness, and privacy
 
@@ -38,6 +41,8 @@ The production bundle depends on the Obsidian host API, with no bundled third-pa
 
 Use Node.js 22 or newer, then run `npm ci` and `npm run verify` (type checking, fixture tests, build, and release/mobile portability checks). Run `npm audit` to inspect development dependencies.
 
-Tests cover endpoint discovery, independent alerts during forecast outages, HTTP caching and conditional requests, rate limits, offline restarts, null quantities, station fallback, alert expiry, Chicago DST, snapshot collision safety and note preservation, and concurrent refreshes. Build success and responsive desktop inspection do not establish real iOS behavior; actual device verification is tracked separately.
+Tests cover endpoint discovery, independent alerts during forecast outages, HTTP caching and conditional requests, rate limits, offline restarts, null quantities, station fallback, alert expiry, Chicago DST, snapshot collision safety and note preservation, and concurrent refreshes. Presentation/DOM tests also cover day/night symbols, local daily ranges, graphical null/zero handling, compact copy, alert states, accessible numerical equivalents, and interaction preservation. `happy-dom` is development-only and is excluded from the runtime bundle. Build success and responsive desktop inspection do not establish real iOS behavior; actual device verification is tracked separately.
+
+The version 1.0.0 assessment and its resulting changes are recorded in [the design review](docs/design-review.md). Product priorities and visual rules are recorded in `PRODUCT.md` and `DESIGN.md`.
 
 Future custom forecasting or continuous collection can use an optional service. Neither is part of this version.

@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$VaultPath)
+param([Parameter(Mandatory=$true)][string]$VaultPath, [ValidateSet('red-beard-dashboard','red-beard-weather')][string[]]$PluginIds = @('red-beard-dashboard','red-beard-weather'))
 $ErrorActionPreference = 'Stop'
 $sourceRoot = Split-Path -Parent (Split-Path -Parent $PSCommandPath)
 $workspace = Split-Path -Parent $sourceRoot
@@ -9,7 +9,7 @@ $backupRoot = Join-Path $workspace ('red-beard-dashboard-install-backups\weather
 New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $vaultRoot '.obsidian\community-plugins.json') -Destination (Join-Path $backupRoot 'community-plugins.json')
 $results = @()
-foreach ($pluginId in @('red-beard-dashboard','red-beard-weather')) {
+foreach ($pluginId in $PluginIds) {
   $source = Join-Path $workspace $pluginId
   $destination = [System.IO.Path]::GetFullPath((Join-Path $pluginsRoot $pluginId))
   if (-not $destination.StartsWith($pluginsRoot + '\', [System.StringComparison]::OrdinalIgnoreCase)) { throw 'Plugin target escaped the vault.' }

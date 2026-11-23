@@ -1,6 +1,6 @@
 {
   "name": "red-beard-weather",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Server-free NWS weather for Obsidian Desktop and mobile.",
   "author": "Red-Beard",
@@ -12,5 +12,11 @@
     "validate": "node scripts/validate.mjs",
     "verify": "npm run typecheck && npm test && npm run build && npm run validate"
   },
-  "devDependencies": {"@types/node": "^22.10.0", "esbuild": "^0.25.0", "obsidian": "^1.8.7", "typescript": "^5.7.0"}
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.25.0",
+    "happy-dom": "^21.0.4",
+    "obsidian": "^1.8.7",
+    "typescript": "^5.7.0"
+  }
 }

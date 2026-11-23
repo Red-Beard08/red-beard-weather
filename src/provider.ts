@@ -12,7 +12,7 @@ export function parseForecast(value: unknown): Forecast {
   if (!Array.isArray(p.periods)) throw new Error("NWS forecast periods are unavailable.");
   return {updated:String(p.updateTime ?? p.generatedAt ?? ""), periods:p.periods.map((v: unknown) => {
     const row = object(v);
-    return {name:String(row.name ?? ""),startTime:String(row.startTime ?? ""),endTime:String(row.endTime ?? ""),temperature:numberOrNull(row.temperature),temperatureUnit:String(row.temperatureUnit ?? ""),windSpeed:String(row.windSpeed ?? "Unavailable"),windDirection:String(row.windDirection ?? ""),shortForecast:String(row.shortForecast ?? ""),detailedForecast:String(row.detailedForecast ?? ""),precipitation:numberOrNull(row.probabilityOfPrecipitation?.value)};
+    return {isDaytime:typeof row.isDaytime === "boolean" ? row.isDaytime : undefined,name:String(row.name ?? ""),startTime:String(row.startTime ?? ""),endTime:String(row.endTime ?? ""),temperature:numberOrNull(row.temperature),temperatureUnit:String(row.temperatureUnit ?? ""),windSpeed:String(row.windSpeed ?? "Unavailable"),windDirection:String(row.windDirection ?? ""),shortForecast:String(row.shortForecast ?? ""),detailedForecast:String(row.detailedForecast ?? ""),precipitation:numberOrNull(row.probabilityOfPrecipitation?.value)};
   })};
 }
 export function parseAlerts(value: unknown): Alert[] {
@@ -33,7 +33,7 @@ export class NwsClient {
     const now = this.clock(), previous = this.cache[url], failure = this.failures.get(url);
     if (failure && failure.until > now) throw new Error(failure.message);
     if (previous && previous.expiresAt > now) return previous;
-    const headers: Record<string,string> = {Accept:"application/geo+json", "User-Agent":"RedBeardWeather/1.0 (Obsidian; https://github.com/Red-Beard08/red-beard-weather)"};
+    const headers: Record<string,string> = {Accept:"application/geo+json", "User-Agent":"RedBeardWeather/1.1 (Obsidian; https://github.com/Red-Beard08/red-beard-weather)"};
     if (previous?.etag) headers["If-None-Match"] = previous.etag;
     if (previous?.lastModified) headers["If-Modified-Since"] = previous.lastModified;
     try {

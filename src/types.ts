@@ -20,6 +20,7 @@ export interface HttpResponse { status: number; headers: Record<string, string>;
 export type Transport = (url: string, headers: Record<string, string>) => Promise<HttpResponse>;
 export interface Feed<T> { data?: T; checkedAt?: number; expiresAt?: number; error?: string; source?: string }
 export interface Period {
+  isDaytime?: boolean;
   name: string; startTime: string; endTime: string; temperature: number | null;
   temperatureUnit: string; windSpeed: string; windDirection: string;
   shortForecast: string; detailedForecast: string; precipitation: number | null;

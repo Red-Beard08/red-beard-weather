@@ -30,6 +30,7 @@ export default class WeatherPlugin extends Plugin {
   settings:WeatherSettings={...DEFAULT_SETTINGS};
   service!:WeatherService;
   private listeners=new Set<()=>void>();
+  private widgetContainers=new Set<HTMLElement>();
   private host?:DashboardHost;
   private detachHost:(()=>void)[]=[];
   private disposed=false;
@@ -60,9 +61,13 @@ export default class WeatherPlugin extends Plugin {
     },60_000));
     this.app.workspace.onLayoutReady(()=>{this.connectHost();void this.refresh();});
   }
-  onunload(){this.disposed=true;this.detachHost.forEach(fn=>fn());this.detachHost=[];this.listeners.clear();}
+  onunload(){this.disposed=true;this.detachHost.forEach(fn=>fn());this.detachHost=[];this.listeners.clear();this.widgetContainers.clear();}
   subscribe(callback:()=>void):()=>void{this.listeners.add(callback);return()=>this.listeners.delete(callback);}
-  private notify(){if(this.disposed)return;for(const fn of this.listeners) fn();if(this.host) void this.host.refreshViews().catch(()=>{/* A missing optional host does not break weather. */});}
+  private notify(){
+    if(this.disposed)return;
+    for(const fn of this.listeners)fn();
+    for(const container of this.widgetContainers){if(!container.isConnected)this.widgetContainers.delete(container);else renderWeather(container,this,true);}
+  }
   private persist():Promise<void>{
     const serialized=JSON.stringify({settings:this.settings,cache:this.service.client.cache});
     this.saves=this.saves.catch(()=>{}).then(async()=>{
@@ -108,11 +113,11 @@ export default class WeatherPlugin extends Plugin {
     if(this.disposed)return;
     const candidate=(this.app as App&{plugins?:{getPlugin:(id:string)=>unknown}}).plugins?.getPlugin("red-beard-dashboard") as DashboardHost|undefined;
     if(candidate===this.host)return;
-    this.detachHost.forEach(fn=>fn());this.detachHost=[];this.host=undefined;
+    this.detachHost.forEach(fn=>fn());this.detachHost=[];this.host=undefined;this.widgetContainers.clear();
     if(!candidate?.registerModule || !candidate.registerWidget)return;
     this.host=candidate;
     this.detachHost.push(candidate.registerModule({id:this.manifest.id,name:"Weather",command:`${this.manifest.id}:open-dashboard`,icon:"cloud-sun",description:"Peoria conditions, forecasts, and NWS alerts.",order:70}));
-    this.detachHost.push(candidate.registerWidget({id:"red-beard-weather/overview",name:"Weather",description:"Local NWS conditions, forecast, and alerts.",icon:"cloud-sun",defaultLayout:{w:4,mobileW:12,h:3,order:15},render:(_,container)=>renderWeather(container,this,true)}));
+    this.detachHost.push(candidate.registerWidget({id:"red-beard-weather/overview",name:"Weather",description:"Conditions now and the next few hours.",icon:"cloud-sun",defaultLayout:{w:4,mobileW:12,h:3,order:15},render:(_,container)=>{for(const old of this.widgetContainers)if(!old.isConnected)this.widgetContainers.delete(old);this.widgetContainers.add(container);renderWeather(container,this,true);}}));
     if(candidate.registerQuickAction)this.detachHost.push(candidate.registerQuickAction({id:"red-beard-weather/new-snapshot",name:"New Weather Snapshot",command:`${this.manifest.id}:new-snapshot`,description:"Save the current NWS data to a Markdown note."}));
   }
 }
