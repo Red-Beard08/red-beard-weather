@@ -1,0 +1,9 @@
+{
+  "id": "red-beard-weather",
+  "name": "Red-Beard Weather",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "Peoria weather, hourly and seven-day forecasts, NWS alerts, and Markdown snapshots. No server or subscription.",
+  "author": "Red-Beard",
+  "isDesktopOnly": false
+}

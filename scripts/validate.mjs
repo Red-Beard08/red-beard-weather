@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+const read=path=>readFile(path,"utf8");
+const manifest=JSON.parse(await read("manifest.json")), pkg=JSON.parse(await read("package.json")), versions=JSON.parse(await read("versions.json"));
+assert.equal(manifest.id,"red-beard-weather");assert.equal(manifest.isDesktopOnly,false);
+assert.equal(pkg.version,manifest.version);assert.equal(versions[manifest.version],manifest.minAppVersion);
+const bundle=await read("main.js"),css=await read("styles.css");
+assert(bundle.length>15000);
+assert(!/require\(["'](?:node:|fs["']|path["']|electron["']|child_process["'])/.test(bundle),"Desktop-only runtime dependency");
+assert(!/\b(?:Buffer|process\.env|eval\(|innerHTML\s*=)/.test(bundle),"Unsafe or nonportable runtime");
+for(const command of ["open-dashboard","refresh","new-snapshot","open-settings"]) assert(bundle.includes(command));
+assert(bundle.includes("registerQuickAction"));assert(css.includes("safe-area-inset-bottom"));assert(css.includes("@media"));
+console.log(`Validated ${manifest.id} ${manifest.version}: release files and mobile portability.`);
